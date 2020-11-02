@@ -53,3 +53,4 @@ jobs:
             docker stop $(docker ps -a -q)
             docker login docker.pkg.github.com -u $G_USERNAME -p $G_TOKEN
             docker pull docker.pkg.github.com/tirsky/ru2orgme/ru2orgme:latest
+            docker run -dit -p 8050:80 docker.pkg.github.com/tirsky/ru2orgme/ru2orgme:latest
