@@ -34,23 +34,23 @@ jobs:
         with:
           name: tirsky/ru2orgme/ru2orgme
           registry: docker.pkg.github.com
-          username: ${{ secrets.GITHUB_USERNAME }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.G_USERNAME }}
+          password: ${{ secrets.TOKEN }}
           dockerfile: app/Dockerfile.prod
           tags: latest
       - name: Deploy package to digitalocean
         uses: appleboy/ssh-action@master
         env:
-          GITHUB_USERNAME: ${{ secrets.GITHUB_USERNAME }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_USERNAME: ${{ secrets.G_USERNAME }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
           host: ${{ secrets.HOST }}
           USERNAME: ${{ secrets.USERNAME }}
           PORT: ${{ secrets.PORT }}
           KEY: ${{ secrets.SSHKEY }}
-          envs: GITHUB_USERNAME, GITHUB_TOKEN
+          envs: G_USERNAME, TOKEN
           script: |
             docker stop $(docker ps -a -q)
-            docker login docker.pkg.github.com -u $GITHUB_USERNAME -p $GITHUB_TOKEN
+            docker login docker.pkg.github.com -u $G_USERNAME -p $TOKEN
             docker pull docker.pkg.github.com/tirsky/ru2orgme/ru2orgme:latest
             docker run -dit -p 80:80 docker.pkg.github.com/tirsky/ru2orgme/ru2orgme:latest
