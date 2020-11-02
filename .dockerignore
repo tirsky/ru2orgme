@@ -1,0 +1,57 @@
+### Python template
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+# Django stuff:
+*.log
+
+# celery beat schedule file
+celerybeat-schedule
+
+# Environments
+.env
+venv/
+
+### macOS template
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+### Vim template
+# Swap
+[._]*.swp
+
+# Session
+Session.vim
+
+# Temporary
+.netrwhist
+*~
+
+### user template
+.gitignore
+.git
+docker-compose.yml
+*.md
+Dockerfile
+.dockerignore
+
+# IntelliJ project files
+.idea
