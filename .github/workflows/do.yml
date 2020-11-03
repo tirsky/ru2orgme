@@ -36,7 +36,7 @@ jobs:
           registry: docker.pkg.github.com
           username: ${{ secrets.G_USERNAME }}
           password: ${{ secrets.G_TOKEN }}
-          path: app
+          workdir: ./app
           dockerfile: Dockerfile.prod
           tags: latest
       - name: Publish front (vuejs) to Github Packages Registry
@@ -46,7 +46,7 @@ jobs:
           registry: docker.pkg.github.com
           username: ${{ secrets.G_USERNAME }}
           password: ${{ secrets.G_TOKEN }}
-          path: ruorg-front
+          workdir: ./ruorg-front
           dockerfile: Dockerfile-prod
           tags: latest
       - name: Deploy package to digitalocean
