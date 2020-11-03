@@ -29,7 +29,7 @@ jobs:
         with:
           source: "."
           target: "/opt/app"
-      - name: Publish to Github Packages Registry
+      - name: Publish back (django) to Github Packages Registry
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
           name: tirsky/ru2orgme/ru2orgme
@@ -38,7 +38,7 @@ jobs:
           password: ${{ secrets.G_TOKEN }}
           dockerfile: app/Dockerfile.prod
           tags: latest
-      - name: Publish front (vue) to Github Packages Registry
+      - name: Publish front (vuejs) to Github Packages Registry
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
           name: tirsky/ru2orgme/ruorg-front
@@ -63,9 +63,10 @@ jobs:
             docker login docker.pkg.github.com -u $G_USERNAME -p $G_TOKEN
             docker pull docker.pkg.github.com/tirsky/ru2orgme/ru2orgme:latest
             docker pull docker.pkg.github.com/tirsky/ru2orgme/ruorg-front:latest
-            docker-compose down -v --remove-orphans
-            docker-compose -f ruorg-front/docker-compose-prod.yml up -d
-            docker-compose -f docker-compose.prod.yml up -d
-            docker-compose -f docker-compose.prod.yml exec web python manage.py migrate --noinput
-            docker-compose -f docker-compose.prod.yml exec web python manage.py collectstatic --no-input --clear
+            cd /opt/app && docker-compose down -v --remove-orphans
+            cd /opt/app/ruorg-front && docker-compose down -v --remove-orphans
+            docker-compose -f /opt/app/ruorg-front/docker-compose-prod.yml up -d
+            docker-compose -f /opt/app/docker-compose.prod.yml up -d
+            docker-compose -f /opt/app/docker-compose.prod.yml exec web python manage.py migrate --noinput
+            docker-compose -f /opt/app/docker-compose.prod.yml exec web python manage.py collectstatic --no-input --clear
             docker ps
