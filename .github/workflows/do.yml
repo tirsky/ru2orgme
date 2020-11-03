@@ -36,7 +36,8 @@ jobs:
           registry: docker.pkg.github.com
           username: ${{ secrets.G_USERNAME }}
           password: ${{ secrets.G_TOKEN }}
-          dockerfile: app/Dockerfile.prod
+          path: app
+          dockerfile: Dockerfile.prod
           tags: latest
       - name: Publish front (vuejs) to Github Packages Registry
         uses: elgohr/Publish-Docker-Github-Action@master
@@ -45,7 +46,8 @@ jobs:
           registry: docker.pkg.github.com
           username: ${{ secrets.G_USERNAME }}
           password: ${{ secrets.G_TOKEN }}
-          dockerfile: ruorg-front/Dockerfile-prod
+          path: ruorg-front
+          dockerfile: Dockerfile-prod
           tags: latest
       - name: Deploy package to digitalocean
         uses: appleboy/ssh-action@master
