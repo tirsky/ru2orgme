@@ -3,6 +3,7 @@ version: '3.7'
 services:
 
   ruorg-front:
+    image: docker.pkg.github.com/tirsky/ru2orgme/ruorg-front:latest
     container_name: ruorg-front
     build:
       context: .
