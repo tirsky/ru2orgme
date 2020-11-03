@@ -65,6 +65,7 @@ jobs:
             docker pull docker.pkg.github.com/tirsky/ru2orgme/ruorg-front:latest
             cd /opt/app && docker-compose down -v --remove-orphans
             cd /opt/app/ruorg-front && docker-compose down -v --remove-orphans
+            cd /opt/app
             docker-compose -f /opt/app/ruorg-front/docker-compose-prod.yml up -d
             docker-compose -f /opt/app/docker-compose.prod.yml up -d
             docker-compose -f /opt/app/docker-compose.prod.yml exec web python manage.py migrate --noinput
