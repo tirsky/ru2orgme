@@ -1,18 +1,166 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
-    <title><%= htmlWebpackPlugin.options.title %></title>
+	<meta charset="UTF-8">
+	<title>Calculator</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+	<link rel="stylesheet" href="css/styles.css">
 </head>
-<body>
-<noscript>
-    <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled.
-        Please enable it to continue.</strong>
-</noscript>
-<div id="app"></div>
-<!-- built files will be auto injected -->
+<body class="green lighten-3">
+	<div id="app">
+		<div>
+			<h1>Credit Calculator</h1>
+			<div class="row">
+				<form class="col s12" @submit.prevent="calculate" autocomplete="off">
+					<div class="card">
+						<div class="card-content">
+							<div class="row">
+								<div class="input-field col s6 m3">
+									<input
+										type="text"
+										id="amount"
+										:class="{invalid: $v.form.amount.$error, valid: !$v.form.amount.$invalid}"
+										v-model.number="$v.form.amount.$model"
+									>
+									<label for="amount">Amount</label>
+									<div v-if="$v.form.amount.$error">
+										<span class="helper-text" v-if="!$v.form.amount.required">The amount field is required</span>
+										<span class="helper-text" v-else-if="!$v.form.amount.decimal">The amount field should be a number</span>
+										<span class="helper-text" v-else-if="!$v.form.amount.min">The amount should be more than 1</span>
+										<span class="helper-text" v-else-if="!$v.form.amount.moreThanInitial">The amount value should be more than initial fee</span>
+									</div>
+								</div>
+								<div class="input-field col s6 m3">
+									<input
+										type="text"
+										id="rate"
+										:class="{invalid: $v.form.rate.$error, valid: !$v.form.rate.$invalid}"
+										v-model.number="$v.form.rate.$model"
+									>
+									<label for="rate">Interest Rate, %</label>
+									<div v-if="$v.form.rate.$error">
+										<span class="helper-text" v-if="!$v.form.rate.required">The interest rate field is required</span>
+										<span class="helper-text" v-else-if="!$v.form.rate.decimal">The interest rate field should be a number</span>
+										<span class="helper-text" v-else-if="!$v.form.rate.between">The interest rate should be between 0 and 100</span>
+									</div>
+								</div>
+								<div class="input-field col s6 m3">
+									<input
+										type="text"
+										id="initial-fee"
+										:class="{invalid: $v.form.initialFee.$error, valid: !$v.form.initialFee.$invalid}"
+										v-model.number="$v.form.initialFee.$model"
+									>
+									<label for="initial-fee">Initial fee</label>
+									<div v-if="$v.form.initialFee.$error">
+										<span class="helper-text" v-if="!$v.form.initialFee.required">The initial fee field is required</span>
+										<span class="helper-text" v-else-if="!$v.form.initialFee.decimal">The initial fee field should be a number</span>
+										<span class="helper-text" v-else-if="!$v.form.initialFee.min">The initial fee should be equal or greater than 0</span>
+										<span class="helper-text" v-else-if="!$v.form.initialFee.lessThanAmount">The initial fee should be less than amount</span>
+									</div>
+								</div>
+								<div class="input-field col s6 m3">
+									<input
+										type="text"
+										id="months"
+										:class="{invalid: $v.form.months.$error, valid: !$v.form.months.$invalid}"
+										v-model.number="$v.form.months.$model"
+									>
+									<label for="months">Loan terms (months)</label>
+									<div v-if="$v.form.months.$error">
+										<span class="helper-text" v-if="!$v.form.months.required">The loan terms field is required</span>
+										<span class="helper-text" v-else-if="!$v.form.months.integer">The loan terms field should be an integer</span>
+										<span class="helper-text" v-else-if="!$v.form.months.min">The loan terms field value should be more than 0</span>
+									</div>
+								</div>
+							</div>
+							<div class="center-align">
+								<button class="btn-small" :disabled="$v.form.$invalid">Calculate</button>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="row" v-if="!$v.form.$invalid && annuity.length == form.months">
+				<div class="col s12 m12 l6">
+					<div class="card">
+						<div class="card-content">
+							<span class="card-title">Differentiated Payments</span>
+							<table class="highlight">
+								<thead>
+									<tr>
+										<th>Month</th>
+										<th>Principal</th>
+										<th>Interest</th>
+										<th>Repayment</th>
+										<th>Balance</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr v-for="row in differentiated">
+										<td>{{ row.month }}</td>
+										<td>{{ row.principal.toFixed(2) }}</td>
+										<td>{{ row.interest.toFixed(2) }}</td>
+										<td>{{ row.repayment.toFixed(2) }}</td>
+										<td>{{ row.debt.toFixed(2) }}</td>
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<td></td>
+										<td><strong>{{ differentiatedPrincipalTotal.toFixed(2) }}</strong></td>
+										<td><strong>{{ differentiatedInterestTotal.toFixed(2) }}</strong></td>
+										<td><strong>{{ differentiatedRepaymentTotal.toFixed(2) }}</strong></td>
+										<td></td>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div class="col s12 m12 l6">
+					<div class="card">
+						<div class="card-content">
+							<span class="card-title">Annuity Payments</span>
+							<table class="highlight">
+								<thead>
+									<tr>
+										<th>Month</th>
+										<th>Pricipal</th>
+										<th>Interest</th>
+										<th>Repayment</th>
+										<th>Balance</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr v-for="row in annuity">
+										<td>{{ row.month }}</td>
+										<td>{{ row.principal.toFixed(2) }}</td>
+										<td>{{ row.interest.toFixed(2) }}</td>
+										<td>{{ row.repayment.toFixed(2) }}</td>
+										<td>{{ row.debt.toFixed(2) }}</td>
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<td></td>
+										<td><strong>{{ annuityPrincipalTotal.toFixed(2) }}</strong></td>
+										<td><strong>{{ annuityInterestTotal.toFixed(2) }}</strong></td>
+										<td><strong>{{ annuityRepaymentTotal.toFixed(2) }}</strong></td>
+										<td></td>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vue@2.5.21/dist/vue.js"></script>
+	<script src="js/libs/vuelidate.min.js"></script>
+	<script src="js/libs/validators.min.js"></script>
+	<script src="js/app.js"></script>
 </body>
 </html>
